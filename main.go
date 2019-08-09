@@ -17,6 +17,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"strings"
 	"os"
 	"path/filepath"
 
@@ -34,7 +35,7 @@ func main() {
     // TODO(twodarek): Respect KUBECONFIG envvar
 
     if kubeconfig_envvar := os.Getenv("FOO"); kubeconfig_envvar != "" {
-    	kubeconfig_tokenized := strings.split(kubeconfig_envvar, ";")
+    	kubeconfig_tokenized := strings.Split(kubeconfig_envvar, ";")
     	kubeconfig = flag.String("kubeconfig", kubeconfig_tokenized[0], "absolute path to the kubeconfig file")
     } else if home := homeDir(); home != "" {
 		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
@@ -59,7 +60,13 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-	fmt.Printf("There are %d pods in the cluster\n", len(pods.Items))
+	fmt.Printf("There are %d pods not ready\n", len(pods.Items))
+	for index, pod := range pods.Items {
+		if(pod.PodStatus.PodPhase != "Running") {
+			fmt.Printf("")
+		}
+	}
+	fmt.Printf(pods.Items)
 
 	// Examples for error handling:
 	// - Use helper functions like e.g. errors.IsNotFound()
