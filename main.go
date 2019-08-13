@@ -17,6 +17,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"strconv"
 	"strings"
 	"os"
 	"path/filepath"
@@ -62,11 +63,11 @@ func main() {
 	}
 	fmt.Printf("There are %d pods not ready\n", len(pods.Items))
 	for index, pod := range pods.Items {
-		if(pod.PodStatus.PodPhase != "Running") {
-			fmt.Printf("")
+		if(pod.Status.Phase != "Running") {
+			fmt.Printf("tmp")
+			fmt.Printf(strconv.Itoa(index))
 		}
 	}
-	fmt.Printf(pods.Items)
 
 	// Examples for error handling:
 	// - Use helper functions like e.g. errors.IsNotFound()
