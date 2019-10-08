@@ -33,11 +33,9 @@ import (
 func main() {
 	var kubeconfig *string
 
-    // TODO(twodarek): Respect KUBECONFIG envvar
-
-    if kubeconfig_envvar := os.Getenv("FOO"); kubeconfig_envvar != "" {
-    	kubeconfig_tokenized := strings.Split(kubeconfig_envvar, ";")
-    	kubeconfig = flag.String("kubeconfig", kubeconfig_tokenized[0], "absolute path to the kubeconfig file")
+    if kubeconfig_envvar := os.Getenv("KUBECONFIG"); kubeconfig_envvar != "" {
+        kubeconfig_tokenized := strings.Split(kubeconfig_envvar, ";")
+        kubeconfig = flag.String("kubeconfig", kubeconfig_tokenized[0], "absolute path to the kubeconfig file")
     } else if home := homeDir(); home != "" {
 		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
 	} else {
