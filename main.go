@@ -3,12 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"strconv"
 	"strings"
 	"os"
 	"path/filepath"
 
-	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
@@ -48,14 +46,14 @@ func main() {
 	}
 	fmt.Printf("There are %d pods\n", len(pods.Items))
 	nonReadyPods := 0
-	for index, pod := range pods.Items {
-		if(pod.Status.Phase != v1.PodRunning) {
-			fmt.Printf("tmp")
-			fmt.Printf(strconv.Itoa(index))
+	fmt.Printf("These pods are not ready: \n")
+	for _, pod := range pods.Items {
+		if(pod.Status.Phase != v1.PodRunning && pod.Status.Phase != v1.PodSucceeded) {
+			fmt.Printf("Name: %s - Status: %s - Reason: %s \n", pod.Name, pod.Status.Phase, pod.Status.Reason)
 			nonReadyPods++
 		}
 	}
-	fmt.Printf("There are %d non-running pods\n", nonReadyPods)
+	fmt.Printf("There are %d non-ready pods\n", nonReadyPods)
 }
 
 func homeDir() string {
