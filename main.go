@@ -60,7 +60,7 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-	fmt.Printf("There are %d pods\n", len(pods.Items))
+	fmt.Printf("Number of pods registered: %d\n", len(pods.Items))
 	nonReadyPods := 0
 	for index, pod := range pods.Items {
 		if(pod.Status.Phase != v1.PodRunning) {
@@ -69,7 +69,22 @@ func main() {
 			nonReadyPods++
 		}
 	}
-	fmt.Printf("There are %d non-running pods\n", nonReadyPods)
+	fmt.Printf("Number of non-running pods: %d\n", nonReadyPods)
+
+	deploys, err := clientset.AppsV1().Deployments("").List(metav1.ListOptions{})
+	if err != nil {
+		panic(err.Error())
+	}
+	fmt.Printf("Number of deployments registered: %d\n", len(deploys.Items))
+	nonReadyDeploys := 0
+	for index, deploy := range deploys.Items {
+		if(deploy.Status.UnavailableReplicas > 0) {
+			fmt.Printf("tmp")
+			fmt.Printf(strconv.Itoa(index))
+			nonReadyDeploys++
+		}
+	}
+	fmt.Printf("Nummber of incomplete deployments: %d\n", nonReadyDeploys)
 
 	// Examples for error handling:
 	// - Use helper functions like e.g. errors.IsNotFound()
