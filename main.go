@@ -17,6 +17,15 @@ import (
      _ "k8s.io/client-go/plugin/pkg/client/auth"
 )
 
+func isNodeReady(node v1.Node) (bool) {
+	for _, condition := range node.Status.Conditions {
+		if (condition.Type == "Ready") {
+			return condition.Status == "True"
+		}
+	}
+	return false
+}
+
 func main() {
     var kubeconfig *string
 
@@ -70,7 +79,23 @@ func main() {
             nonReadyDeploys++
         }
     }
-    fmt.Printf("Nummber of incomplete deployments: %d\n", nonReadyDeploys)
+    fmt.Printf("Number of incomplete deployments: %d\n", nonReadyDeploys)
+
+    nodes, err := clientset.CoreV1().Nodes().List(metav1.ListOptions{})
+    if err != nil {
+        panic(err.Error())
+    }
+    fmt.Printf("Number of nodes registered: %d\n", len(nodes.Items))
+    nonReadyNodes := 0
+    for index, node := range nodes.Items {
+        if(!isNodeReady(node)) {
+            fmt.Printf("tmp")
+            fmt.Printf(strconv.Itoa(index))
+            nonReadyNodes++
+        }
+    }
+    fmt.Printf("Number of incomplete nodes: %d\n", nonReadyNodes)
+
 
     // Examples for error handling:
     // - Use helper functions like e.g. errors.IsNotFound()
