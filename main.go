@@ -1,6 +1,7 @@
 package main
 
 import (
+    "context"
     "flag"
     "fmt"
     "strconv"
@@ -28,6 +29,7 @@ func isNodeReady(node v1.Node) (bool) {
 
 func main() {
     var kubeconfig *string
+    ctx := context.Background()
 
     if kubeconfig_envvar := os.Getenv("KUBECONFIG"); kubeconfig_envvar != "" {
         kubeconfig_tokenized := strings.Split(kubeconfig_envvar, ";")
@@ -51,7 +53,7 @@ func main() {
         panic(err.Error())
     }
 
-    pods, err := clientset.CoreV1().Pods("").List(metav1.ListOptions{})
+    pods, err := clientset.CoreV1().Pods("").List(ctx, metav1.ListOptions{})
     if err != nil {
         panic(err.Error())
     }
@@ -66,7 +68,7 @@ func main() {
     }
     fmt.Printf("Number of non-running pods: %d\n", nonReadyPods)
 
-    deploys, err := clientset.AppsV1().Deployments("").List(metav1.ListOptions{})
+    deploys, err := clientset.AppsV1().Deployments("").List(ctx, metav1.ListOptions{})
     if err != nil {
         panic(err.Error())
     }
@@ -81,7 +83,7 @@ func main() {
     }
     fmt.Printf("Number of incomplete deployments: %d\n", nonReadyDeploys)
 
-    nodes, err := clientset.CoreV1().Nodes().List(metav1.ListOptions{})
+    nodes, err := clientset.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
     if err != nil {
         panic(err.Error())
     }
@@ -102,7 +104,7 @@ func main() {
     // - And/or cast to StatusError and use its properties like e.g. ErrStatus.Message
     namespace := "default"
     pod := "example-xxxxx"
-    _, err = clientset.CoreV1().Pods(namespace).Get(pod, metav1.GetOptions{})
+    _, err = clientset.CoreV1().Pods(namespace).Get(ctx, pod, metav1.GetOptions{})
     if errors.IsNotFound(err) {
         fmt.Printf("Pod %s in namespace %s not found\n", pod, namespace)
     } else if statusError, isStatus := err.(*errors.StatusError); isStatus {
